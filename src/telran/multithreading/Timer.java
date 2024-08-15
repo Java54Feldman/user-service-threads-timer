@@ -6,34 +6,31 @@ import java.time.format.DateTimeFormatter;
 public class Timer extends Thread {
 	//displaying time in a given format and a given resolution
 	//example displaying each second or each 5 second, etc.
-	private static final DateTimeFormatter DEFAULT_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME;
-	private static final Float DEFAULT_TIME_RESOLUTION = 1f;
-	DateTimeFormatter timeFormatter; 
-	Float timeResolution;
+	private static final String DEFAULT_FORMATTER_PATTERN = "HH.mm.ss";
+	private static final long DEFAULT_TIMER_RESOLUTION = 1000;
+	private DateTimeFormatter dtf; 
+	private long timerResolution;
+	private volatile boolean running = true;
 	
-	public Timer(DateTimeFormatter timeFormatter, Float timeResolution) {
-		this.timeFormatter = timeFormatter;
-		this.timeResolution = timeResolution;
+	public Timer(String pattern, long timerResolution) {
+		dtf = DateTimeFormatter.ofPattern(pattern);
+		this.timerResolution = timerResolution;
 		setDaemon(true);
 	}
-	public Timer(Float timeResolution) {
-		this(DEFAULT_TIME_FORMATTER, timeResolution);
-	}
-	public Timer(DateTimeFormatter timeFormatter) {
-		this(timeFormatter, DEFAULT_TIME_RESOLUTION);
-	}
 	public Timer() {
-		this(DEFAULT_TIME_FORMATTER, DEFAULT_TIME_RESOLUTION);
+		this(DEFAULT_FORMATTER_PATTERN, DEFAULT_TIMER_RESOLUTION);
 	}
 	public void run() {
-		boolean running = true;
 		while(running) {
-			System.out.println(LocalTime.now().format(timeFormatter));
+			System.out.println(LocalTime.now().format(dtf));
 			try {
-				sleep((long) (timeResolution * 1000));
+				sleep(timerResolution);
 			} catch (InterruptedException e) {
-				running = false;
+				
 			}
 		}
+	}
+	public void finish() {
+		running = false;
 	}
 }
